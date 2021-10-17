@@ -21,7 +21,6 @@ public class ClienteDetalhamentoDTO implements Serializable{
 	private String email;
 	private String cpfOuCnpj;
 	private Integer tipo;
-	private String senha;
 	private List<Endereco> enderecos = new ArrayList<>();
 	private Set<String> telefones = new HashSet<>();
 	private Set<Integer> perfil = new HashSet<>();
@@ -34,7 +33,6 @@ public class ClienteDetalhamentoDTO implements Serializable{
 		this.dataNascimento = cliente.getDataNascimento();
 		this.email = cliente.getEmail();
 		this.cpfOuCnpj = cliente.getCpfOuCnpj();
-		this.senha = cliente.getSenha();
 		this.enderecos = cliente.getEnderecos();
 		this.telefones = cliente.getTelefones();
 	}
@@ -85,14 +83,6 @@ public class ClienteDetalhamentoDTO implements Serializable{
 
 	public void setTipo(Integer tipo) {
 		this.tipo = tipo;
-	}
-
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
 	}
 
 	public List<Endereco> getEnderecos() {
