@@ -1,6 +1,7 @@
 package br.com.builders.mvp.andresa.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -9,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 
 import br.com.builders.mvp.andresa.domain.Cliente;
 import br.com.builders.mvp.andresa.services.validations.ClienteUpdate;
+import br.com.builders.mvp.andresa.util.Util;
 
 @ClienteUpdate
 public class ClienteDTO  implements Serializable{
@@ -25,16 +27,44 @@ public class ClienteDTO  implements Serializable{
 	@Email(message = "E-mail inválido.")
 	private String email;
 	
+	private Date dataNascimento;	
+	private int idade;
+	private boolean aniversario;
+	private String cpfOuCnpj;
+	
 	public ClienteDTO() {
 	}
-	
 	
 	public ClienteDTO(Cliente obj) {
 		this.id = obj.getId();
 		this.nome = obj.getNome();
 		this.email = obj.getEmail();
+		this.dataNascimento = obj.getDataNascimento();
+		this.cpfOuCnpj = obj.getCpfOuCnpj();
+		
 	}
 
+	public int getIdade() {
+		if(getDataNascimento() != null) {
+			return Util.calculoIdade(getDataNascimento());
+		}
+		return idade;
+	}
+
+	public void setIdade(int idade) {
+		this.idade = idade;
+	}
+
+	public boolean isAniversario() {
+		if(getDataNascimento() != null) {
+			return Util.comparaDiaEMes(getDataNascimento(), new Date());
+		}
+		return aniversario;
+	}
+
+	public void setAniversario(boolean aniversario) {
+		this.aniversario = aniversario;
+	}
 
 	public Integer getId() {
 		return id;
@@ -57,6 +87,24 @@ public class ClienteDTO  implements Serializable{
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+
+	public Date getDataNascimento() {
+		return dataNascimento;
+	}
+
+
+	public void setDataNascimento(Date dataNascimento) {
+		this.dataNascimento = dataNascimento;
+	}
+
+	public String getCpfOuCnpj() {
+		return cpfOuCnpj;
+	}
+
+	public void setCpfOuCnpj(String cpfOuCnpj) {
+		this.cpfOuCnpj = cpfOuCnpj;
 	}
 
 }

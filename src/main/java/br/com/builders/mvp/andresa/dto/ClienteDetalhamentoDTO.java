@@ -1,14 +1,19 @@
 package br.com.builders.mvp.andresa.dto;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.com.builders.mvp.andresa.domain.Cliente;
 import br.com.builders.mvp.andresa.domain.Endereco;
+import br.com.builders.mvp.andresa.domain.enums.Perfil;
+import br.com.builders.mvp.andresa.domain.enums.TipoCliente;
 import br.com.builders.mvp.andresa.util.Util;
 
 public class ClienteDetalhamentoDTO implements Serializable{
@@ -23,9 +28,9 @@ public class ClienteDetalhamentoDTO implements Serializable{
 	private Integer tipo;
 	private List<Endereco> enderecos = new ArrayList<>();
 	private Set<String> telefones = new HashSet<>();
-	private Set<Integer> perfil = new HashSet<>();
 	private int idade;
 	private boolean aniversario;
+	private Set<Integer> perfis = new HashSet<>();
 	
 	public ClienteDetalhamentoDTO(Cliente cliente) {
 		this.id = cliente.getId();
@@ -35,6 +40,8 @@ public class ClienteDetalhamentoDTO implements Serializable{
 		this.cpfOuCnpj = cliente.getCpfOuCnpj();
 		this.enderecos = cliente.getEnderecos();
 		this.telefones = cliente.getTelefones();
+		this.tipo =  (cliente.getTipo() == null) ? null : cliente.getTipo().getCod();
+		addPerfil(Perfil.CLIENTE);
 	}
 
 	public Integer getId() {
@@ -56,6 +63,15 @@ public class ClienteDetalhamentoDTO implements Serializable{
 	public Date getDataNascimento() {
 		return dataNascimento;
 	}
+	
+	public String getDataNascimentoTexto() {
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		if(getDataNascimento() != null) {
+			return dateFormat.format(getDataNascimento());
+		}
+		return "Data não informada!";
+	}
+	
 
 	public void setDataNascimento(Date dataNascimento) {
 		this.dataNascimento = dataNascimento;
@@ -77,8 +93,8 @@ public class ClienteDetalhamentoDTO implements Serializable{
 		this.cpfOuCnpj = cpfOuCnpj;
 	}
 
-	public Integer getTipo() {
-		return tipo;
+	public TipoCliente getTipo() {
+		return TipoCliente.toEnum(tipo);
 	}
 
 	public void setTipo(Integer tipo) {
@@ -99,15 +115,6 @@ public class ClienteDetalhamentoDTO implements Serializable{
 
 	public void setTelefones(Set<String> telefones) {
 		this.telefones = telefones;
-	}
-
-
-	public Set<Integer> getPerfil() {
-		return perfil;
-	}
-
-	public void setPerfil(Set<Integer> perfil) {
-		this.perfil = perfil;
 	}
 
 	public int getIdade() {
@@ -133,6 +140,15 @@ public class ClienteDetalhamentoDTO implements Serializable{
 	}
 
 	public ClienteDetalhamentoDTO() {
+		addPerfil(Perfil.CLIENTE);
+	}
+	
+	public Set<Perfil> getPerfis() {
+		return perfis.stream().map(x -> Perfil.toEnum(x)).collect(Collectors.toSet());
+	}
+	
+	public void addPerfil(Perfil perfil) {
+		perfis.add(perfil.getCod());
 	}
 
 }

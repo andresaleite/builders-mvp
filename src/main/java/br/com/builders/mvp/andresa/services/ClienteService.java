@@ -1,13 +1,10 @@
 package br.com.builders.mvp.andresa.services;
 
-import java.awt.image.BufferedImage;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,13 +12,15 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import br.com.builders.mvp.andresa.domain.Cidade;
 import br.com.builders.mvp.andresa.domain.Cliente;
 import br.com.builders.mvp.andresa.domain.Endereco;
 import br.com.builders.mvp.andresa.domain.enums.Perfil;
 import br.com.builders.mvp.andresa.domain.enums.TipoCliente;
+import br.com.builders.mvp.andresa.dto.ClienteUpdateDTO;
+import br.com.builders.mvp.andresa.dto.ClienteUpdateDTO;
+import br.com.builders.mvp.andresa.dto.ClienteUpdateDTO;
 import br.com.builders.mvp.andresa.dto.ClienteDTO;
 import br.com.builders.mvp.andresa.dto.ClienteNewDTO;
 import br.com.builders.mvp.andresa.repositories.ClienteRepository;
@@ -43,17 +42,7 @@ public class ClienteService {
 	@Autowired
 	private EnderecoRepository enderecoRepo;
 	
-	@Autowired
-	private S3Service s3Service;
 	
-	@Autowired
-	private ImageService imageService;
-	
-	@Value("${img.prefix.client.profile}")
-	private String prefix;
-	
-	@Value("${img.profile.size}")
-	private Integer size;
 
 	public Cliente find(Integer id) {
 		UserSS user = UserService.authenticated();
@@ -74,6 +63,20 @@ public class ClienteService {
 		}
 	
 		Cliente obj = repo.findByEmail(email);
+		if (obj == null) {
+			throw new ObjectNotFoundException(
+					"Objeto não encontrado! Id: " + user.getId() + ", Tipo: " + Cliente.class.getName());
+		}
+		return obj;
+	}
+	
+	public Cliente findByCpf(String cpf) {
+		UserSS user = UserService.authenticated();
+		if (user == null || !user.hasRole(Perfil.ADMIN)) {
+			throw new AuthorizationException("Acesso negado. É preciso ser administrador para pesquisar pelo CPF.");
+		}
+	
+		Cliente obj = repo.findByCpfOuCnpj(cpf);
 		if (obj == null) {
 			throw new ObjectNotFoundException(
 					"Objeto não encontrado! Id: " + user.getId() + ", Tipo: " + Cliente.class.getName());
@@ -108,6 +111,10 @@ public class ClienteService {
 	private void updateData(Cliente newObj, Cliente obj) {
 		newObj.setNome(obj.getNome());
 		newObj.setEmail(obj.getEmail());
+		newObj.setSenha(obj.getSenha());
+		newObj.setEnderecos(obj.getEnderecos());
+		newObj.setTelefones(obj.getTelefones());
+		newObj.setDataNascimento(obj.getDataNascimento());
 	}
 
 	public void delete(Integer id) {
@@ -139,18 +146,19 @@ public class ClienteService {
 		return cli;
 	}
 	
-	public URI uploadProfilePicture(MultipartFile multipartFile) {
-		UserSS user = UserService.authenticated();
-		if (user == null) {
-			throw new AuthorizationException("Acesso negado");
-		}
+	public Cliente fromAlteracaoDTO(ClienteUpdateDTO objAlteracaoDTO) {
+		Cliente cli 	= new Cliente(objAlteracaoDTO.getId(), objAlteracaoDTO.getNome(), objAlteracaoDTO.getEmail(), objAlteracaoDTO.getCpfOuCnpj(), TipoCliente.toEnum(objAlteracaoDTO.getTipo()), pe.encode(objAlteracaoDTO.getSenha()), objAlteracaoDTO.getDataNascimento());
 		
-		BufferedImage jpgImage = imageService.getJpgImageFromFile(multipartFile);
-		jpgImage = imageService.cropSquare(jpgImage);
-		jpgImage = imageService.resize(jpgImage, size);
+		Cidade cid		= new Cidade(objAlteracaoDTO.getCidadeId(), null, null);
 		
-		String fileName = prefix + user.getId() + ".jpg";
+		Endereco end 	= new Endereco(null, objAlteracaoDTO.getLogradouro(), 
+						objAlteracaoDTO.getNumero(), objAlteracaoDTO.getComplemento(), 
+						objAlteracaoDTO.getBairro(), objAlteracaoDTO.getCep(), cli, cid);
 		
-		return s3Service.uploadFile(imageService.getInputStream(jpgImage,"jpg"), fileName, "image");
+		cli.getEnderecos().add(end);
+		cli.getTelefones().addAll(Arrays.asList(objAlteracaoDTO.getTelefone1(), objAlteracaoDTO.getTelefone2(), objAlteracaoDTO.getTelefone3()));
+		
+		return cli;
 	}
+	
 }

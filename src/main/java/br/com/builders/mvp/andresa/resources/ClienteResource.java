@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.builders.mvp.andresa.domain.Cliente;
+import br.com.builders.mvp.andresa.dto.ClienteUpdateDTO;
 import br.com.builders.mvp.andresa.dto.ClienteDTO;
 import br.com.builders.mvp.andresa.dto.ClienteDetalhamentoDTO;
 import br.com.builders.mvp.andresa.dto.ClienteNewDTO;
@@ -50,6 +50,12 @@ public class ClienteResource {
 		Cliente obj = serv.findByEmail(email);		
 		return ResponseEntity.ok().body(obj);
 	}
+	
+	@RequestMapping(value="/cpf", method=RequestMethod.GET)
+	public ResponseEntity<Cliente> findCpf(@RequestParam(value="value") String cpf) {
+		Cliente obj = serv.findByCpf(cpf);
+		return ResponseEntity.ok().body(obj);
+	}
 
 	@RequestMapping(method=RequestMethod.GET)
 	public ResponseEntity<List<ClienteDTO>> findAll() {
@@ -62,7 +68,7 @@ public class ClienteResource {
 	@RequestMapping(value="/pages",method=RequestMethod.GET)
 	public ResponseEntity<Page<ClienteDTO>> findPage(
 			@RequestParam(value="page", defaultValue = "0") Integer page, 
-			@RequestParam(value="linesPerPage", defaultValue = "24") Integer linesPerPage, 
+			@RequestParam(value="linesPerPage", defaultValue = "5") Integer linesPerPage, 
 			@RequestParam(value="orderBy", defaultValue = "nome") String orderBy, 
 			@RequestParam(value="direction", defaultValue = "ASC") String direction) {
 		Page<Cliente> list = serv.findPage(page, linesPerPage, orderBy, direction);
@@ -81,8 +87,8 @@ public class ClienteResource {
 	}
 	
 	@RequestMapping(value="/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<Void> update(@Valid @RequestBody ClienteDTO objDTO, @PathVariable Integer id) {
-		Cliente obj = serv.fromDTO(objDTO);
+	public ResponseEntity<Void> update(@Valid @RequestBody ClienteUpdateDTO objDTO, @PathVariable Integer id) {
+		Cliente obj = serv.fromAlteracaoDTO(objDTO);
 		obj.setId(id);
 		obj = serv.update(obj);
 		return ResponseEntity.noContent().build();
@@ -96,9 +102,5 @@ public class ClienteResource {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@RequestMapping(value="/picture", method=RequestMethod.POST)
-	public ResponseEntity<Void> uploadProfilePicture(@RequestParam(name="file") MultipartFile file) {
-		URI uri = serv.uploadProfilePicture(file);
-		return ResponseEntity.created(uri).build();
-	}
+	
 }

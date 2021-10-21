@@ -13,10 +13,11 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import br.com.builders.mvp.andresa.domain.Cliente;
 import br.com.builders.mvp.andresa.dto.ClienteDTO;
+import br.com.builders.mvp.andresa.dto.ClienteUpdateDTO;
 import br.com.builders.mvp.andresa.repositories.ClienteRepository;
 import br.com.builders.mvp.andresa.resources.exceptions.FieldMessage;
 
-public class ClienteUpdateValidator implements ConstraintValidator<ClienteUpdate, ClienteDTO> {
+public class ClienteUpdateValidator implements ConstraintValidator<ClienteUpdate, ClienteUpdateDTO> {
 	
 	@Autowired
 	private HttpServletRequest request;
@@ -29,7 +30,7 @@ public class ClienteUpdateValidator implements ConstraintValidator<ClienteUpdate
 	}
 
 	@Override
-	 public boolean isValid(ClienteDTO objDto, ConstraintValidatorContext context) {
+	 public boolean isValid(ClienteUpdateDTO objDto, ConstraintValidatorContext context) {
 		
 		@SuppressWarnings("unchecked")
 		Map<String, String> map = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
@@ -40,6 +41,11 @@ public class ClienteUpdateValidator implements ConstraintValidator<ClienteUpdate
 		Cliente aux = repo.findByEmail(objDto.getEmail());
 		if(aux != null && !aux.getId().equals(uriId)) {
 			list.add(new FieldMessage("email", "O e-mail já foi cadastrado."));
+		}
+		
+		Cliente  cpfCnpj = repo.findByCpfOuCnpj(objDto.getCpfOuCnpj());
+		if(cpfCnpj != null) {
+			list.add(new FieldMessage("cpfOuCnpj", "O CPF ou CNPJ já foi cadastrado."));
 		}
 		
 		for (FieldMessage e : list) {

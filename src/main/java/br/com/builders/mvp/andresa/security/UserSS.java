@@ -18,16 +18,18 @@ public class UserSS implements UserDetails {
 	private String email;
 	private String senha;
 	private Collection<? extends GrantedAuthority> authorities;
+	private String cpfCnpj;
 	
 	public UserSS() {
 	}
 	
-	public UserSS(Integer id, String email, String senha, Set<Perfil> perfis) {
+	public UserSS(Integer id, String email, String senha, Set<Perfil> perfis, String cpfCnpj) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.senha = senha;
 		this.authorities = perfis.stream().map(x -> new SimpleGrantedAuthority(x.getDescricao())).collect(Collectors.toList());
+		this.cpfCnpj = cpfCnpj;
 	}
 
 	public Integer getId() {
@@ -72,4 +74,13 @@ public class UserSS implements UserDetails {
 	public boolean hasRole(Perfil perfil) {
 		return getAuthorities().contains(new SimpleGrantedAuthority(perfil.getDescricao()));
 	}
+
+	public String getCpfCnpj() {
+		return cpfCnpj;
+	}
+
+	public void setCpfCnpj(String cpfCnpj) {
+		this.cpfCnpj = cpfCnpj;
+	}
+
 }
