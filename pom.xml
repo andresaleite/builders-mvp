@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>br.com.builders.mvp.andresa</groupId>
 	<artifactId>builders</artifactId>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	<name>builders</name>
 	<description>Processo seletivo da empresa Builders em outubro de 2021</description>
 
