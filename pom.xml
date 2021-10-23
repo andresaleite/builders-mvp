@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>br.com.builders.mvp.andresa</groupId>
 	<artifactId>builders</artifactId>
-	<version>0.0.7</version>
+	<version>0.0.8</version>
 	<name>builders</name>
 	<description>Processo seletivo da empresa Builders em outubro de 2021</description>
 
@@ -114,16 +114,23 @@
 	</dependencies>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
+	    <plugins>
+	        <plugin>
+	            <groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-compiler-plugin</artifactId>
+	            <configuration>
+	                <source>11</source>
+	                <target>11</target>
+	            </configuration>
+	        </plugin>
+	        <plugin>
+	            <groupId>org.springframework.boot</groupId>
+	            <artifactId>spring-boot-maven-plugin</artifactId>
+	            <configuration>
 	                <mainClass>br.com.builders.mvp.andresa.MVPApplication</mainClass>
 	            </configuration>
-			</plugin>
-		</plugins>
-		
+	        </plugin>
+	    </plugins>
 	</build>
 
 </project>
