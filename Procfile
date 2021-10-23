@@ -1,1 +1,1 @@
-web java -Dserver.port=$PORT -Dspring.profiles.active=prod $JAVA_OPTS -jar target/builders-0.0.6.jar
+web java -Dserver.port=$PORT -Dspring.profiles.active=prod $JAVA_OPTS -jar target/builders-0.0.7.jar
